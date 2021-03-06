@@ -8,20 +8,20 @@
     "name": "bit",
     "email": "gabiluca@gmail.com"
   },
-  "icon": "",
+  "icon": "images/gremlin.png",
   "galleryBanner": {
     "color": "#000000",
     "theme": "dark"
   },
   "license": "MIT",
   "bugs": {
-    "url": "",
-    "email": ""
+    "url": "https://github.com/LucaGabi/vscode-restclient/tree/gremlin0",
+    "email": "gabiluca@gmail.com"
   },
   "homepage": "",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/LucaGabi/vscode-restclient/tree/gremlin0"
   },
   "engines": {
     "vscode": "^1.38.0"

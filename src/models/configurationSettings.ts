@@ -120,7 +120,7 @@ export class RestClientSettings implements IRestClientSettings {
         const document = getCurrentTextDocument();
         const restClientSettings = workspace.getConfiguration("gremlin-client", document?.uri);
         this.gremlinHost = restClientSettings.get<string>("host", '127.0.0.1');
-        this.gremlinPort = restClientSettings.get<number>("host", 8182);
+        this.gremlinPort = restClientSettings.get<number>("port", 8182);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",
                                                                      {
