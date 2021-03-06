@@ -1,7 +1,8 @@
+// import { EOL } from 'os';
 import { EOL } from 'os';
 import { Range, TextEditor } from 'vscode';
 import * as Constants from '../common/constants';
-import { VariableProcessor } from './variableProcessor';
+
 
 export interface RequestRangeOptions {
     ignoreCommentLine?: boolean;
@@ -10,7 +11,7 @@ export interface RequestRangeOptions {
     ignoreResponseRange?: boolean;
 }
 
-export interface SelectedRequest {
+export interface SelectedQuery {
     text: string;
     name?: string;
     warnBeforeSend: boolean;
@@ -19,7 +20,9 @@ export interface SelectedRequest {
 export class Selector {
     private static readonly responseStatusLineRegex = /^\s*HTTP\/[\d.]+/;
 
-    public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedRequest | null> {
+    public static async getRequest(editor: TextEditor, range: Range | null = null): Promise<SelectedQuery | null> {
+
+
         if (!editor.document) {
             return null;
         }
@@ -49,25 +52,31 @@ export class Selector {
             return null;
         }
 
-        selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1).join(EOL);
+        selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1)
+            .map(x => x.trim()).join('')
+            .replace(';', '');
 
-        // variables replacement
-        selectedText = await VariableProcessor.processRawRequest(selectedText);
+        // //variables replacement
+        // selectedText = await VariableProcessor.processRawRequest(selectedText);
 
         return {
             text: selectedText,
             name: requestVariable,
             warnBeforeSend
         };
+
+
+
     }
 
     public static getRequestRanges(lines: string[], options?: RequestRangeOptions): [number, number][] {
         options = {
-                ignoreCommentLine: true,
-                ignoreEmptyLine: true,
-                ignoreFileVariableDefinitionLine: true,
-                ignoreResponseRange: true,
-            ...options};
+            ignoreCommentLine: true,
+            ignoreEmptyLine: true,
+            ignoreFileVariableDefinitionLine: true,
+            ignoreResponseRange: true,
+            ...options
+        };
         const requestRanges: [number, number][] = [];
         const delimitedLines = this.getDelimiterRows(lines);
         delimitedLines.push(lines.length);
@@ -168,6 +177,6 @@ export class Selector {
     private static getDelimiterRows(lines: string[]): number[] {
         return Object.entries(lines)
             .filter(([, value]) => /^#{3,}/.test(value))
-            .map(([index, ]) => +index);
+            .map(([index,]) => +index);
     }
 }

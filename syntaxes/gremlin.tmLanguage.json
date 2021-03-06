@@ -1,0 +1,66 @@
+{
+  "scopeName": "source.gremlin",
+  "fileTypes": [
+    "gremlin"
+  ],
+  "keyEquivalent": "^~H",
+  "name": "gremlin",
+  "patterns": [
+    {
+      "include": "#metadata"
+    },
+    {
+      "include": "#comments"
+    },
+    {
+      "begin": "\\s*(?=(g.|graph.))",
+      "name": "gremlin.squery",
+      "end": "^\\s*(\\#{3,}.*?)?\\s*$",
+      "endCaptures": {
+        "0": {
+          "name": "comment.line.sharp.gremlin"
+        }
+      },
+      "patterns": [
+        {
+          "include": "source.groovy"
+        }
+      ]
+    }
+  ],
+  "repository": {
+    "metadata": {
+      "patterns": [
+        {
+          "match": "^\\s*\\#{3,}\\s+(?:((@)name)\\s+([^\\s\\.]+))$",
+          "captures": {
+            "1": {
+              "name": "entity.other.attribute-name"
+            },
+            "2": {
+              "name": "punctuation.definition.block.tag.metadata"
+            },
+            "3": {
+              "name": "entity.name.type.gremlin"
+            }
+          },
+          "name": "comment.line.sharp.gremlin"
+        }
+       
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "match": "^\\s*\\#{1,}.*$",
+          "name": "comment.line.sharp.gremlin"
+        },
+        {
+          "match": "^\\s*\\/{2,}.*$",
+          "name": "comment.line.double-slash.gremlin"
+        }
+      ]
+    }
+    
+  }
+}

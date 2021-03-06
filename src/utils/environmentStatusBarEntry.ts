@@ -24,7 +24,7 @@ export class EnvironmentStatusEntry {
 
     private showHideStatusBar() {
         const document = getCurrentTextDocument();
-        if (document && languages.match(['http', 'plaintext'], document)) {
+        if (document && languages.match(['gremlin', 'plaintext'], document)) {
             this.environmentEntry.show();
         } else {
             this.environmentEntry.hide();

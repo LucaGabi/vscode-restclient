@@ -24,7 +24,7 @@ export class HttpResponseWebview extends BaseWebview {
 
     private readonly urlRegex = /(https?:\/\/[^\s"'<>\]\)]+)/gi;
 
-    private readonly panelResponses: Map<WebviewPanel, HttpResponse>;
+    private readonly panelResponses: Map<WebviewPanel, any[]>;
 
     private readonly clipboard: Clipboard = env.clipboard;
 
@@ -36,7 +36,7 @@ export class HttpResponseWebview extends BaseWebview {
         return 'httpResponsePreviewFocus';
     }
 
-    private get activeResponse(): HttpResponse | undefined {
+    private get activeResponse(): any[] | undefined {
         return this.activePanel ? this.panelResponses.get(this.activePanel) : undefined;
     }
 
@@ -44,7 +44,7 @@ export class HttpResponseWebview extends BaseWebview {
         super(context);
 
         // Init response webview map
-        this.panelResponses = new Map<WebviewPanel, HttpResponse>();
+        this.panelResponses = new Map<WebviewPanel, any[]>();
 
         this.context.subscriptions.push(commands.registerCommand('rest-client.fold-response', this.foldResponseBody, this));
         this.context.subscriptions.push(commands.registerCommand('rest-client.unfold-response', this.unfoldResponseBody, this));
@@ -54,8 +54,9 @@ export class HttpResponseWebview extends BaseWebview {
         this.context.subscriptions.push(commands.registerCommand('rest-client.save-response-body', this.saveBody, this));
     }
 
-    public async render(response: HttpResponse, column: ViewColumn) {
+    public async render(response: any[], column: ViewColumn) {
         let panel: WebviewPanel;
+        this.settings.showResponseInDifferentTab = true;
         if (this.settings.showResponseInDifferentTab || this.panels.length === 0) {
             panel = window.createWebviewPanel(
                 this.viewType,
@@ -124,40 +125,22 @@ export class HttpResponseWebview extends BaseWebview {
     @trace('Copy Response Body')
     private async copyBody() {
         if (this.activeResponse) {
-            await this.clipboard.writeText(this.activeResponse.body);
+            await this.clipboard.writeText('this.activeResponse');
         }
     }
 
     @trace('Save Response')
     private async save() {
-        if (this.activeResponse) {
-            const fullResponse = this.getFullResponseString(this.activeResponse);
-            const defaultFilePath = UserDataManager.getResponseSaveFilePath(`Response-${Date.now()}.http`);
-            try {
-                await this.openSaveDialog(defaultFilePath, fullResponse);
-            } catch {
-                window.showErrorMessage('Failed to save latest response to disk.');
-            }
-        }
+
     }
 
     @trace('Save Response Body')
     private async saveBody() {
-        if (this.activeResponse) {
-            const extension = MimeUtility.getExtension(this.activeResponse.contentType, this.settings.mimeAndFileExtensionMapping);
-            const fileName = !extension ? `Response-${Date.now()}` : `Response-${Date.now()}.${extension}`;
-            const defaultFilePath = UserDataManager.getResponseBodySaveFilePath(fileName);
-            try {
-                await this.openSaveDialog(defaultFilePath, this.activeResponse.bodyBuffer);
-            } catch {
-                window.showErrorMessage('Failed to save latest response body to disk');
-            }
-        }
+
     }
 
-    private getTitle(response: HttpResponse): string {
-        const prefix = (this.settings.requestNameAsResponseTabTitle && response.request.name) || 'Response';
-        return `${prefix}(${response.timingPhases.total ?? 0}ms)`;
+    private getTitle(response: any[]): string {
+        return `Response: ` + response.length;
     }
 
     private getFullResponseString(response: HttpResponse): string {
@@ -183,19 +166,21 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
-    private getHtmlForWebview(panel: WebviewPanel, response: HttpResponse): string {
+    private getHtmlForWebview(panel: WebviewPanel, response: any[]): string {
         let innerHtml: string;
         let width = 2;
-        let contentType = response.contentType;
+        let contentType = "response.contentType";
         if (contentType) {
             contentType = contentType.trim();
         }
-        if (MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
-            innerHtml = `<img src="data:${contentType};base64,${base64(response.bodyBuffer)}">`;
-        } else {
-            const code = this.highlightResponse(response);
+        // if (MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
+        //     innerHtml = `<img src="data:${contentType};base64,${base64(response.bodyBuffer)}">`;
+        // } else 
+        {
+            const jss = JSON.stringify(response);
+            const code = this.highlightResponse(jss);
             width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
-            innerHtml = `<pre><code>${this.addLineNums(code)}</code></pre>`;
+            innerHtml = `<pre><code>${this.addLineNums(jss)}</code></pre>`;
         }
 
         // Content Security Policy
@@ -215,7 +200,7 @@ export class HttpResponseWebview extends BaseWebview {
     </head>
     <body>
         <div>
-            ${this.settings.disableAddingHrefLinkForLargeResponse && response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024
+            ${true
                 ? innerHtml
                 : this.addUrlLinks(innerHtml, contentType)}
             <a id="scroll-to-top" role="button" aria-label="scroll to top" title="Scroll To Top"><span class="icon"></span></a>
@@ -224,21 +209,20 @@ export class HttpResponseWebview extends BaseWebview {
     </body>`;
     }
 
-    private highlightResponse(response: HttpResponse): string {
+    private highlightResponse(response: string): string {
         let code = '';
         const previewOption = this.settings.previewOption;
         if (previewOption === PreviewOption.Exchange) {
             // for add request details
-            const request = response.request;
-            const requestNonBodyPart = `${request.method} ${request.url} HTTP/1.1
-${HttpResponseWebview.formatHeaders(request.headers)}`;
-            code += hljs.highlight('http', requestNonBodyPart + '\r\n').value;
-            if (request.body) {
-                if (typeof request.body !== 'string') {
-                    request.body = 'NOTE: Request Body From File Is Not Shown';
-                }
-                const requestBodyPart = `${ResponseFormatUtility.formatBody(request.body, request.contentType, true)}`;
-                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(request.contentType, request.body);
+            // const request = response.request;
+            // const requestNonBodyPart = `${request.method} ${request.url} HTTP/1.1 ${HttpResponseWebview.formatHeaders(request.headers)}`;
+            code += hljs.highlight('http', 'requestNonBodyPart' + '\r\n').value;
+            if (response?.length) {
+                // if (typeof request.body !== 'string') {
+                //     request.body = 'NOTE: Request Body From File Is Not Shown';
+                // }
+                const requestBodyPart = `${ResponseFormatUtility.formatBody(response, 'application/json', true)}`;
+                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias('application/json', response);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, requestBodyPart).value;
                 } else {
@@ -251,18 +235,16 @@ ${HttpResponseWebview.formatHeaders(request.headers)}`;
         }
 
         if (previewOption !== PreviewOption.Body) {
-            const responseNonBodyPart = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}
-${HttpResponseWebview.formatHeaders(response.headers)}`;
+            const responseNonBodyPart = ``;
             code += hljs.highlight('http', responseNonBodyPart + (previewOption !== PreviewOption.Headers ? '\r\n' : '')).value;
         }
 
         if (previewOption !== PreviewOption.Headers) {
-            const responseBodyPart = `${ResponseFormatUtility.formatBody(response.body, response.contentType, this.settings.suppressResponseBodyContentTypeValidationWarning)}`;
-            if (this.settings.disableHighlightResonseBodyForLargeResponse &&
-                response.bodySizeInBytes > this.settings.largeResponseBodySizeLimitInMB * 1024 * 1024) {
+            const responseBodyPart = ``;
+            if (false) {
                 code += responseBodyPart;
             } else {
-                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias(response.contentType, responseBodyPart);
+                const bodyLanguageAlias = HttpResponseWebview.getHighlightLanguageAlias('application/json', responseBodyPart);
                 if (bodyLanguageAlias) {
                     code += hljs.highlight(bodyLanguageAlias, responseBodyPart).value;
                 } else {

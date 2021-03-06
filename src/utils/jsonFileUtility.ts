@@ -1,4 +1,6 @@
 import * as fs from 'fs-extra';
+var flatten2 = require('flat')
+
 
 export class JsonFileUtility {
     public static async serializeToFile<T>(path: string, data: T): Promise<void> {
@@ -16,3 +18,9 @@ export class JsonFileUtility {
         }
     }
 }
+
+
+
+export function flatten(object) {
+    return flatten2(object);
+};

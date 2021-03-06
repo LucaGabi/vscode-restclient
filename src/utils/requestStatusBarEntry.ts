@@ -40,37 +40,38 @@ export class RequestStatusEntry {
 
     public update(status: RequestStatus) {
         this.sizeEntry.hide();
+        return;
+//TODO:
+        // switch (status.state) {
+        //     case RequestState.Closed:
+        //     case RequestState.Error:
+        //         this.durationEntry.hide();
+        //         break;
 
-        switch (status.state) {
-            case RequestState.Closed:
-            case RequestState.Error:
-                this.durationEntry.hide();
-                break;
+        //     case RequestState.Pending:
+        //         this.showDurationEntry('$(sync~spin) Waiting...', 'Click to cancel', 'rest-client.cancel-request');
+        //         break;
 
-            case RequestState.Pending:
-                this.showDurationEntry('$(sync~spin) Waiting...', 'Click to cancel', 'rest-client.cancel-request');
-                break;
+        //     case RequestState.Cancelled:
+        //         this.showDurationEntry('$(circle-slash) Cancelled');
+        //         break;
 
-            case RequestState.Cancelled:
-                this.showDurationEntry('$(circle-slash) Cancelled');
-                break;
+        //     case RequestState.Received:
+        //         const response = status.response;
+        //         const tooltip = [
+        //             'Breakdown of Duration:',
+        //             `Socket: ${response?.timingPhases?.wait?.toFixed(1) ?? 0}ms`,
+        //             `DNS: ${response?.timingPhases?.dns?.toFixed(1) ?? 0}ms`,
+        //             `TCP: ${response?.timingPhases?.tcp?.toFixed(1) ?? 0}ms`,
+        //             `Request: ${response?.timingPhases?.request?.toFixed(1) ?? 0}ms`,
+        //             `FirstByte: ${response?.timingPhases?.firstByte?.toFixed(1) ?? 0}ms`,
+        //             `Download: ${response?.timingPhases?.download?.toFixed(1) ?? 0}ms`
+        //         ].join(EOL);
 
-            case RequestState.Received:
-                const response = status.response;
-                const tooltip = [
-                    'Breakdown of Duration:',
-                    `Socket: ${response.timingPhases.wait?.toFixed(1) ?? 0}ms`,
-                    `DNS: ${response.timingPhases.dns?.toFixed(1) ?? 0}ms`,
-                    `TCP: ${response.timingPhases.tcp?.toFixed(1) ?? 0}ms`,
-                    `Request: ${response.timingPhases.request?.toFixed(1) ?? 0}ms`,
-                    `FirstByte: ${response.timingPhases.firstByte?.toFixed(1) ?? 0}ms`,
-                    `Download: ${response.timingPhases.download?.toFixed(1) ?? 0}ms`
-                ].join(EOL);
-
-                this.showDurationEntry(`$(clock) ${response.timingPhases.total ?? 0}ms`, tooltip);
-                this.showSizeEntry(response);
-                break;
-        }
+        //         this.showDurationEntry(`$(clock) ${response?.timingPhases?.total ?? 0}ms`, tooltip);
+        //         this.showSizeEntry(response);
+        //         break;
+        // }
     }
 
     private showSizeEntry(response: HttpResponse) {
