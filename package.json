@@ -3,10 +3,10 @@
   "displayName": "Gremlin Client",
   "description": "Gremlin Client for Visual Studio Code",
   "version": "0.0.1",
-  "publisher": "humao",
+  "publisher": "Bit",
   "author": {
-    "name": "Bit",
-    "email": ""
+    "name": "bit",
+    "email": "gabiluca@gmail.com"
   },
   "icon": "",
   "galleryBanner": {
@@ -71,7 +71,7 @@
       {
         "command": "gremlin-client.request",
         "title": "Send Request",
-        "category": "Rest Client"
+        "category": "Gremlin Client"
       }
     ],
     "menus": {
@@ -85,20 +85,26 @@
     "keybindings": [
       {
         "command": "gremlin-client.request",
-        "key": "ctrl+alt+r",
+        "key": "ctrl+enter",
         "mac": "cmd+alt+r",
-        "when": "editorTextFocus && editorLangId == 'http'"
+        "when": "editorTextFocus && editorLangId == 'gremlin'"
       }
     ],
     "configuration": {
       "type": "object",
       "title": "Gremlin Client",
       "properties": {
-        "gremlin-client.followredirect": {
-          "type": "boolean",
-          "default": true,
+        "gremlin-client.host": {
+          "type": "string",
+          "default": "127.0.0.1",
           "scope": "resource",
-          "description": "Follow HTTP 3xx responses as redirects."
+          "description": "gremlin host"
+        },
+        "gremlin-client.port": {
+          "type": "string",
+          "default": 0,
+          "scope": "resource",
+          "description": "gremlin port"
         }
       }
     },
