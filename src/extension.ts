@@ -28,11 +28,11 @@ export async function activate(context: ExtensionContext) {
 
     const requestController = new RequestController(context);
     const historyController = new HistoryController();
-    
+
     const environmentController = await EnvironmentController.create();
     context.subscriptions.push(requestController);
     context.subscriptions.push(historyController);
-    
+
     context.subscriptions.push(environmentController);
     context.subscriptions.push(commands.registerCommand('rest-client.request', ((document: TextDocument, range: Range) => requestController.run(range))));
     context.subscriptions.push(commands.registerCommand('rest-client.rerun-last-request', () => requestController.rerun()));

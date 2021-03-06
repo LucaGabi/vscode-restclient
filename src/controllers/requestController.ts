@@ -1,28 +1,21 @@
-import { SelectedQuery } from './../utils/selector';
-import { ExtensionContext, Range, TextDocument, ViewColumn, window } from 'vscode';
+import { ExtensionContext, Range, window } from 'vscode';
 import Logger from '../logger';
 import { RestClientSettings } from '../models/configurationSettings';
-import { HistoricalHttpRequest, HttpRequest } from '../models/httpRequest';
 import { trace } from "../utils/decorator";
 import { execQuery } from '../utils/gclient';
-import { HttpClient } from '../utils/httpClient';
 import { RequestState, RequestStatusEntry } from '../utils/requestStatusBarEntry';
+import { SelectedQuery } from './../utils/selector';
 
-import * as vscode from 'vscode';
 import { Selector } from '../utils/selector';
-import { UserDataManager } from '../utils/userDataManager';
 import { getCurrentTextDocument } from '../utils/workspaceUtility';
 import { HttpResponseTextDocumentView } from '../views/httpResponseTextDocumentView';
 import { HttpResponseWebview } from '../views/httpResponseWebview';
-import { flatten } from '../utils/jsonFileUtility';
 
 const stringify = require("json-stringify-pretty-compact");
 
 export class RequestController {
     private readonly _restClientSettings: RestClientSettings = RestClientSettings.Instance;
     private _requestStatusEntry: RequestStatusEntry;
-    //TODO:
-    private _httpClient: HttpClient;
     private _webview: HttpResponseWebview;
     private _textDocumentView: HttpResponseTextDocumentView;
     private _lastRequest?: SelectedQuery;
@@ -30,7 +23,6 @@ export class RequestController {
 
     public constructor(context: ExtensionContext) {
         this._requestStatusEntry = new RequestStatusEntry();
-        this._httpClient = new HttpClient();
         this._webview = new HttpResponseWebview(context);
         this._webview.onDidCloseAllWebviewPanels(() => this._requestStatusEntry.update({ state: RequestState.Closed }));
         this._textDocumentView = new HttpResponseTextDocumentView();
@@ -57,7 +49,7 @@ export class RequestController {
         // parse http request
         // const httpRequest = await RequestParserFactory.createRequestParser(text).parseHttpRequest(name);
 
-        await this.runCore(selectedRequest, document);
+        await this.runCore(selectedRequest);
     }
 
     @trace('Rerun Request')
@@ -77,7 +69,7 @@ export class RequestController {
         this._requestStatusEntry.update({ state: RequestState.Cancelled });
     }
 
-    private async runCore(query: SelectedQuery, document?: TextDocument) {
+    private async runCore(query: SelectedQuery) {
         // clear status bar
         this._requestStatusEntry.update({ state: RequestState.Pending });
 
@@ -89,8 +81,8 @@ export class RequestController {
         try {
             const response = await execQuery(
                 {
-                    host: '127.0.0.1',
-                    port: 8182,
+                    host:  RestClientSettings.Instance.gremlinHost || '127.0.0.1',
+                    port:  RestClientSettings.Instance.gremlinPort || 8182,
                     nodeLimit: 1000,
                     query: query.text
                 }

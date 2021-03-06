@@ -42,7 +42,7 @@ export function execQuery(o: { host: string, port: number, nodeLimit: number, qu
 
         const gremlinHost = o.host;
         const gremlinPort = o.port;
-        const nodeLimit = o.nodeLimit;
+        // const nodeLimit = o.nodeLimit;
         const query = o.query;
 
         const client = new gremlin.driver.Client(`ws://${gremlinHost}:${gremlinPort}/gremlin`, { traversalSource: 'g', mimeType: 'application/json' });

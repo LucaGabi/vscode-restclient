@@ -1,22 +1,14 @@
-import * as fs from 'fs-extra';
-import * as os from 'os';
-import { Clipboard, commands, env, ExtensionContext, Uri, ViewColumn, WebviewPanel, window, workspace } from 'vscode';
-import { RequestHeaders, ResponseHeaders } from '../models/base';
-import { HttpRequest } from '../models/httpRequest';
-import { HttpResponse } from '../models/httpResponse';
+import { Clipboard, commands, env, ExtensionContext, ViewColumn, WebviewPanel, window } from 'vscode';
 import { PreviewOption } from '../models/previewOption';
 import { trace } from '../utils/decorator';
 import { disposeAll } from '../utils/dispose';
 import { MimeUtility } from '../utils/mimeUtility';
-import { base64, isJSONString } from '../utils/misc';
+import { isJSONString } from '../utils/misc';
 import { ResponseFormatUtility } from '../utils/responseFormatUtility';
-import { UserDataManager } from '../utils/userDataManager';
 import { BaseWebview } from './baseWebview';
 
 const hljs = require('highlight.js');
 
-const OPEN = 'Open';
-const COPYPATH = 'Copy Path';
 
 type FoldingRange = [number, number];
 
@@ -143,28 +135,28 @@ export class HttpResponseWebview extends BaseWebview {
         return `Response: ` + response.length;
     }
 
-    private getFullResponseString(response: HttpResponse): string {
-        const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
-        const headerString = Object.entries(response.headers).reduce((acc, [name, value]) => acc + `${name}: ${value}${os.EOL}`, '');
-        const body = response.body ? `${os.EOL}${response.body}` : '';
-        return `${statusLine}${headerString}${body}`;
-    }
+    // private getFullResponseString(response: HttpResponse): string {
+    //     const statusLine = `HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}${os.EOL}`;
+    //     const headerString = Object.entries(response.headers).reduce((acc, [name, value]) => acc + `${name}: ${value}${os.EOL}`, '');
+    //     const body = response.body ? `${os.EOL}${response.body}` : '';
+    //     return `${statusLine}${headerString}${body}`;
+    // }
 
-    private async openSaveDialog(path: string, content: string | Buffer) {
-        const uri = await window.showSaveDialog({ defaultUri: Uri.file(path) });
-        if (!uri) {
-            return;
-        }
+    // private async openSaveDialog(path: string, content: string | Buffer) {
+    //     const uri = await window.showSaveDialog({ defaultUri: Uri.file(path) });
+    //     if (!uri) {
+    //         return;
+    //     }
 
-        const filePath = uri.fsPath;
-        await fs.writeFile(filePath, content, { flag: 'w' });
-        const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: OPEN }, { title: COPYPATH });
-        if (btn?.title === OPEN) {
-            workspace.openTextDocument(filePath).then(window.showTextDocument);
-        } else if (btn?.title === COPYPATH) {
-            await this.clipboard.writeText(filePath);
-        }
-    }
+    //     const filePath = uri.fsPath;
+    //     await fs.writeFile(filePath, content, { flag: 'w' });
+    //     const btn = await window.showInformationMessage(`Saved to ${filePath}`, { title: OPEN }, { title: COPYPATH });
+    //     if (btn?.title === OPEN) {
+    //         workspace.openTextDocument(filePath).then(window.showTextDocument);
+    //     } else if (btn?.title === COPYPATH) {
+    //         await this.clipboard.writeText(filePath);
+    //     }
+    // }
 
     private getHtmlForWebview(panel: WebviewPanel, response: any[]): string {
         let innerHtml: string;
@@ -175,13 +167,13 @@ export class HttpResponseWebview extends BaseWebview {
         }
         // if (MimeUtility.isBrowserSupportedImageFormat(contentType) && !HttpResponseWebview.isHeadRequest(response)) {
         //     innerHtml = `<img src="data:${contentType};base64,${base64(response.bodyBuffer)}">`;
-        // } else 
-        {
-            const jss = JSON.stringify(response);
-            const code = this.highlightResponse(jss);
-            width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
-            innerHtml = `<pre><code>${this.addLineNums(jss)}</code></pre>`;
-        }
+        // } else
+        // {
+        const jss = JSON.stringify(response);
+        const code = this.highlightResponse(jss);
+        width = (code.split(/\r\n|\r|\n/).length + 1).toString().length;
+        innerHtml = `<pre><code>${this.addLineNums(jss)}</code></pre>`;
+        // }
 
         // Content Security Policy
         const nonce = new Date().getTime() + '' + new Date().getMilliseconds();
@@ -369,19 +361,19 @@ export class HttpResponseWebview extends BaseWebview {
         return result;
     }
 
-    private static formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
-        let headerString = '';
-        for (const header in headers) {
-            if (headers.hasOwnProperty(header)) {
-                let value = headers[header];
-                if (typeof headers[header] !== 'string') {
-                    value = <string>headers[header];
-                }
-                headerString += `${header}: ${value}\n`;
-            }
-        }
-        return headerString;
-    }
+    // private static formatHeaders(headers: RequestHeaders | ResponseHeaders): string {
+    //     let headerString = '';
+    //     for (const header in headers) {
+    //         if (headers.hasOwnProperty(header)) {
+    //             let value = headers[header];
+    //             if (typeof headers[header] !== 'string') {
+    //                 value = <string>headers[header];
+    //             }
+    //             headerString += `${header}: ${value}\n`;
+    //         }
+    //     }
+    //     return headerString;
+    // }
 
     private static getHighlightLanguageAlias(contentType: string | undefined, content: string | null = null): string | null {
         if (MimeUtility.isJSON(contentType)) {
@@ -403,7 +395,7 @@ export class HttpResponseWebview extends BaseWebview {
         }
     }
 
-    private static isHeadRequest({ request: { method } }: { request: HttpRequest }): boolean {
-        return method.toLowerCase() === 'head';
-    }
+    // private static isHeadRequest({ request: { method } }: { request: HttpRequest }): boolean {
+    //     return method.toLowerCase() === 'head';
+    // }
 }

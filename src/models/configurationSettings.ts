@@ -83,6 +83,8 @@ export class RestClientSettings implements IRestClientSettings {
     private readonly brackets: CharacterPair[];
 
     private static _instance: RestClientSettings;
+    public gremlinHost: string;
+    public gremlinPort: number;
 
     public static get Instance(): RestClientSettings {
         if (!this._instance) {
@@ -116,7 +118,9 @@ export class RestClientSettings implements IRestClientSettings {
 
     private initializeSettings() {
         const document = getCurrentTextDocument();
-        const restClientSettings = workspace.getConfiguration("rest-client", document?.uri);
+        const restClientSettings = workspace.getConfiguration("gremlin-client", document?.uri);
+        this.gremlinHost = restClientSettings.get<string>("host", '127.0.0.1');
+        this.gremlinPort = restClientSettings.get<number>("host", 8182);
         this.followRedirect = restClientSettings.get<boolean>("followredirect", true);
         this.defaultHeaders = restClientSettings.get<RequestHeaders>("defaultHeaders",
                                                                      {

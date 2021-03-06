@@ -5,7 +5,6 @@ import { getCurrentHttpFileName } from '../utils/workspaceUtility';
 
 export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
 
-    private noNameReqCount = 0;
 
     public async provideDocumentSymbols(document: TextDocument, token: CancellationToken): Promise<SymbolInformation[]> {
         const symbols: SymbolInformation[] = [];
@@ -48,7 +47,7 @@ export class HttpDocumentSymbolProvider implements DocumentSymbolProvider {
             }
 
             if (blockStart - 1 <= blockEnd) {
-                const [name, container] = await this.getRequestSymbolInfo(lines[blockStart - 1], requestName);
+                const [name,] = await this.getRequestSymbolInfo(lines[blockStart - 1], requestName);
                 symbols.push(
                     new SymbolInformation(
                         name,

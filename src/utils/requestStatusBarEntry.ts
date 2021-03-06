@@ -1,8 +1,6 @@
-import { EOL } from 'os';
 import { StatusBarAlignment, StatusBarItem, window } from 'vscode';
 import { HttpResponse } from '../models/httpResponse';
 
-const filesize = require('filesize');
 
 type NonReceivedRequestStatus = {
     state: RequestState.Closed | RequestState.Cancelled | RequestState.Error | RequestState.Pending
@@ -41,7 +39,7 @@ export class RequestStatusEntry {
     public update(status: RequestStatus) {
         this.sizeEntry.hide();
         return;
-//TODO:
+        // TODO:
         // switch (status.state) {
         //     case RequestState.Closed:
         //     case RequestState.Error:
@@ -74,20 +72,20 @@ export class RequestStatusEntry {
         // }
     }
 
-    private showSizeEntry(response: HttpResponse) {
-        this.sizeEntry.text = `$(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
-        this.sizeEntry.tooltip = [
-            'Breakdown of Response Size:',
-            `Headers: ${filesize(response.headersSizeInBytes)}`,
-            `Body: ${filesize(response.bodySizeInBytes)}`
-        ].join(EOL);
-        this.sizeEntry.show();
-    }
+    // private showSizeEntry(response: HttpResponse) {
+    //     this.sizeEntry.text = `$(database) ${filesize(response.bodySizeInBytes + response.headersSizeInBytes)}`;
+    //     this.sizeEntry.tooltip = [
+    //         'Breakdown of Response Size:',
+    //         `Headers: ${filesize(response.headersSizeInBytes)}`,
+    //         `Body: ${filesize(response.bodySizeInBytes)}`
+    //     ].join(EOL);
+    //     this.sizeEntry.show();
+    // }
 
-    private showDurationEntry(text: string, tooltip?: string, command?: string) {
-        this.durationEntry.text = text;
-        this.durationEntry.tooltip = tooltip;
-        this.durationEntry.command = command;
-        this.durationEntry.show();
-    }
+    // private showDurationEntry(text: string, tooltip?: string, command?: string) {
+    //     this.durationEntry.text = text;
+    //     this.durationEntry.tooltip = tooltip;
+    //     this.durationEntry.command = command;
+    //     this.durationEntry.show();
+    // }
 }

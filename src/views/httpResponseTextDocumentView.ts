@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { SelectedQuery } from './../utils/selector';
 
 // tslint:disable-next-line:ordered-imports
-import { languages, Position, Range, TextDocument, ViewColumn, window, workspace, TextEditor } from 'vscode';
+import { Position, Range, TextDocument, ViewColumn, window, workspace, TextEditor } from 'vscode';
 import { RestClientSettings } from '../models/configurationSettings';
 
 
