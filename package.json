@@ -75,18 +75,13 @@
       }
     ],
     "menus": {
-      "commandPalette": [
-        {
-          "command": "gremlin-client.fold-response",
-          "when": "httpResponsePreviewFocus"
-        }
-      ]
+      
     },
     "keybindings": [
       {
         "command": "gremlin-client.request",
         "key": "ctrl+enter",
-        "mac": "cmd+alt+r",
+        "mac": "cmd+enter",
         "when": "editorTextFocus && editorLangId == 'gremlin'"
       }
     ],

@@ -53,8 +53,8 @@ export class Selector {
         }
 
         selectedText = rawLines.slice(requestRange[0], requestRange[1] + 1)
-            .map(x => x.trim()).join('')
-            .replace(';', '');
+            .map(x => x.trim()).join('');
+            // .replace(';', '');
 
         // //variables replacement
         // selectedText = await VariableProcessor.processRawRequest(selectedText);

@@ -45,15 +45,27 @@ export function execQuery(o: { host: string, port: number, nodeLimit: number, qu
         // const nodeLimit = o.nodeLimit;
         const query = o.query;
 
-        const client = new gremlin.driver.Client(`ws://${gremlinHost}:${gremlinPort}/gremlin`, { traversalSource: 'g', mimeType: 'application/json' });
+        const client = new gremlin.driver.Client(`ws://${gremlinHost}:${gremlinPort}/gremlin`, {
+            traversalSource: 'g', mimeType: 'application/json',
+            session: 'grem0'
+        });
 
         // client.submit(makeQuery(query, nodeLimit), {})
         //     .then((result) => r(nodesToJson(result._items)))
         //     .catch((err) => j(err));
 
-        client.submit(query, {})
-            .then((result) => r(result))
+        const all: any[] = [];
+        query.split(';').forEach(element => {
+            all.push(client.submit(element, {}));
+        });
+
+        Promise.all(all)
+            .then(v => r(v[v.length - 1]))
             .catch((err) => j(err));
+
+        // client.submit(query, {})
+        //     .then((result) => r(result))
+        //     .catch((err) => j(err));
 
 
     });
