@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import * as gremlin from '../utils/gs';
 
 export function mapToObj(inputMap) {
@@ -36,7 +37,67 @@ export function makeQuery(query, nodeLimit) {
     return `${query}${nodeLimitQuery}.dedup().as('node').project('id', 'label', 'properties', 'edges').by(__.id()).by(__.label()).by(__.valueMap().by(__.unfold())).by(__.outE().project('id', 'from', 'to', 'label', 'properties').by(__.id()).by(__.select('node').id()).by(__.inV().id()).by(__.label()).by(__.valueMap().by(__.unfold())).fold())`;
 }
 
-export function execQuery(o: { host: string, port: number, nodeLimit: number, query: string }): Promise<any> {
+var child: any = null;
+var p: Observable<string>;
+var isGremlinInited = 0;
+export var PCP = { data: <any[]>[] };
+
+export function execQuery(o: { path: string, query: string }): Observable<any> {
+
+    if (!p)
+        p = Observable.create((observer) => {
+            if (isGremlinInited == 0) {
+
+                isGremlinInited = 1;
+
+                child = require('child_process').execFile(o.path + '\\gremlin.bat', [
+                    // 'arg1', 'arg2', 'arg3', 
+                ], {
+                    // detachment and ignored stdin are the key here: 
+                    cwd: o.path,
+                    detached: true,
+                    stdio: ['ignore', 1, 2]
+                });
+                // and unref() somehow disentangles the child's event loop from the parent's: 
+                child.unref();
+                child.stdout.on('data', function (data) {
+
+
+                    if (isGremlinInited == 1) {
+                        isGremlinInited = 2;
+
+                        child.stdin.write(
+                            `:remote connect tinkerpop.server conf/remote.yaml session\n
+                         :remote console\n`);
+
+                        child.stdin.write(`g\n`);
+
+                    }
+
+                    PCP.data.push(data)
+                    observer.next(null)
+                    
+
+                });
+
+                child.stdout.on('exit', () => {
+                    isGremlinInited = 0;
+                    observer.complete();
+                })
+            }
+        });
+
+
+
+    if (isGremlinInited == 2) {
+        const query = o.query;
+        child.stdin.write(`${query}\n`);
+    }
+
+    return p;
+}
+
+export function execQuery2(o: { host: string, port: number, nodeLimit: number, query: string }): Promise<any> {
 
     const p = new Promise<any>((r, j) => {
 
