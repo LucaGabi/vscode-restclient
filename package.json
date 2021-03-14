@@ -87,17 +87,11 @@
       "type": "object",
       "title": "Gremlin Client",
       "properties": {
-        "gremlin-client.host": {
+        "gremlin-client.clientPath": {
           "type": "string",
-          "default": "127.0.0.1",
+          "default": "",
           "scope": "resource",
-          "description": "gremlin host"
-        },
-        "gremlin-client.port": {
-          "type": "string",
-          "default": 0,
-          "scope": "resource",
-          "description": "gremlin port"
+          "description": "gremlin java client"
         }
       }
     },
